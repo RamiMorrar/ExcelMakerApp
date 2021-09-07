@@ -20,11 +20,19 @@ namespace ExcelMaker
             await SaveExcelFile(people, file);
         }
 
-        private static Task SaveExcelFile(List<Person> people, FileInfo file)
+        private static async Task SaveExcelFile(List<Person> people, FileInfo file)
         {
             DeleteIfExists(file);
 
+            using var package = new ExcelPackage(file);
 
+            var ws = package.Workbook.Worksheets.Add(Name:"MainReport");
+
+            var range = ws.Cells[Address: "A1"].LoadFromCollection(people, PrintHeaders:true);
+
+            range.AutoFitColumns();
+
+            await package.SaveAsync();
         }
 
         private static void DeleteIfExists(FileInfo file)
